@@ -174,19 +174,17 @@ public class WPMainActivity extends Activity implements Bucket.Listener<Note> {
         });
 
         if (savedInstanceState == null) {
-            if (AccountHelper.isSignedIn()) {
-                // open note detail if activity called from a push, otherwise return to the tab
-                // that was showing last time
-                boolean openedFromPush = (getIntent() != null && getIntent().getBooleanExtra(ARG_OPENED_FROM_PUSH,
-                        false));
-                if (openedFromPush) {
-                    getIntent().putExtra(ARG_OPENED_FROM_PUSH, false);
-                    launchWithNoteId();
-                } else {
-                    int position = AppPrefs.getMainTabIndex();
-                    if (mTabAdapter.isValidPosition(position) && position != mViewPager.getCurrentItem()) {
-                        mViewPager.setCurrentItem(position);
-                    }
+            // open note detail if activity called from a push, otherwise return to the tab
+            // that was showing last time
+            boolean openedFromPush = (getIntent() != null && getIntent().getBooleanExtra(ARG_OPENED_FROM_PUSH,
+                    false));
+            if (openedFromPush) {
+                getIntent().putExtra(ARG_OPENED_FROM_PUSH, false);
+                launchWithNoteId();
+            } else {
+                int position = AppPrefs.getMainTabIndex();
+                if (mTabAdapter.isValidPosition(position) && position != mViewPager.getCurrentItem()) {
+                    mViewPager.setCurrentItem(position);
                 }
             }
         }
