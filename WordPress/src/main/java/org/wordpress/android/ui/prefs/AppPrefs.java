@@ -16,6 +16,7 @@ import org.wordpress.android.ui.stats.StatsTimeframe;
 
 public class AppPrefs {
     private static final int THEME_IMAGE_SIZE_WIDTH_DEFAULT = 400;
+    private static final int MAIN_TAB_INDEX_DEFAULT = 1;
 
     public interface PrefKey {
         String name();
@@ -116,11 +117,15 @@ public class AppPrefs {
     }
 
     private static int getInt(PrefKey key) {
+        return getInt(key, 0);
+    }
+
+    private static int getInt(PrefKey key, int defaultValue) {
         try {
             String value = getString(key);
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            return 0;
+            return defaultValue;
         }
     }
 
@@ -263,7 +268,7 @@ public class AppPrefs {
     }
 
     public static int getMainTabIndex() {
-        return getInt(DeletablePrefKey.MAIN_TAB_INDEX);
+        return getInt(DeletablePrefKey.MAIN_TAB_INDEX, MAIN_TAB_INDEX_DEFAULT);
     }
 
     public static void setMainTabIndex(int index) {
