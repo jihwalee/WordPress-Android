@@ -66,6 +66,7 @@ public class MySiteFragment extends Fragment
     private LinearLayout mAdminView;
     private View mFabView;
     private LinearLayout mNoSiteView;
+    private LinearLayout mLoggedOutView;
     private ScrollView mScrollView;
     private ImageView mNoSiteDrakeImageView;
 
@@ -145,6 +146,7 @@ public class MySiteFragment extends Fragment
         mAdminView = (LinearLayout) rootView.findViewById(R.id.admin_section);
         mScrollView = (ScrollView) rootView.findViewById(R.id.scroll_view);
         mNoSiteView = (LinearLayout) rootView.findViewById(R.id.no_site_view);
+        mLoggedOutView = (LinearLayout) rootView.findViewById(R.id.logged_out_view);
         mNoSiteDrakeImageView = (ImageView) rootView.findViewById(R.id.my_site_no_site_view_drake);
         mFabView = rootView.findViewById(R.id.fab_button);
 
@@ -303,9 +305,17 @@ public class MySiteFragment extends Fragment
             return;
         }
 
+        if (!AccountHelper.isSignedIn()) {
+            mLoggedOutView.setVisibility(View.VISIBLE);
+            mScrollView.setVisibility(View.GONE);
+            mFabView.setVisibility(View.GONE);
+            mNoSiteView.setVisibility(View.GONE);
+        }
+
         if (blog == null) {
             mScrollView.setVisibility(View.GONE);
             mFabView.setVisibility(View.GONE);
+            mLoggedOutView.setVisibility(View.GONE);
             mNoSiteView.setVisibility(View.VISIBLE);
 
             // if the screen height is too short, we can just hide the drake illustration
@@ -322,6 +332,7 @@ public class MySiteFragment extends Fragment
 
         mScrollView.setVisibility(View.VISIBLE);
         mNoSiteView.setVisibility(View.GONE);
+        mLoggedOutView.setVisibility(View.GONE);
 
         toggleAdminVisibility();
 
