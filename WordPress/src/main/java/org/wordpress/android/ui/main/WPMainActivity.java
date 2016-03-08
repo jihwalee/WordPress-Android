@@ -188,8 +188,6 @@ public class WPMainActivity extends Activity implements Bucket.Listener<Note> {
                         mViewPager.setCurrentItem(position);
                     }
                 }
-            } else {
-                ActivityLauncher.showSignInForResult(this);
             }
         }
     }
