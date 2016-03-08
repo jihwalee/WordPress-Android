@@ -310,6 +310,8 @@ public class MySiteFragment extends Fragment
             mScrollView.setVisibility(View.GONE);
             mFabView.setVisibility(View.GONE);
             mNoSiteView.setVisibility(View.GONE);
+
+            return;
         }
 
         if (blog == null) {
