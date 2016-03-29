@@ -23,6 +23,7 @@ android {
 
     dexOptions {
         jumboMode = true
+        javaMaxHeapSize = "4g"
     }
 
     compileSdkVersion 23
