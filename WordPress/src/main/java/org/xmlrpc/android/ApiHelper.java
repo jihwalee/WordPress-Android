@@ -20,12 +20,14 @@ import org.wordpress.android.R;
 import org.wordpress.android.WordPress;
 import org.wordpress.android.analytics.AnalyticsTracker;
 import org.wordpress.android.datasets.CommentTable;
+import org.wordpress.android.models.AccountHelper;
 import org.wordpress.android.models.Blog;
 import org.wordpress.android.models.BlogIdentifier;
 import org.wordpress.android.models.Comment;
 import org.wordpress.android.models.CommentList;
 import org.wordpress.android.models.CommentStatus;
 import org.wordpress.android.models.FeatureSet;
+import org.wordpress.android.networking.gravatar.ServiceGenerator;
 import org.wordpress.android.ui.media.MediaGridFragment.Filter;
 import org.wordpress.android.ui.stats.StatsUtils;
 import org.wordpress.android.ui.stats.StatsWidgetProvider;
@@ -36,6 +38,11 @@ import org.wordpress.android.util.DateTimeUtils;
 import org.wordpress.android.util.MapUtils;
 import org.wordpress.android.util.helpers.MediaFile;
 import org.xmlpull.v1.XmlPullParserException;
+import org.xmlrpc.android.pojo.Member;
+import org.xmlrpc.android.pojo.MethodCall;
+import org.xmlrpc.android.pojo.MethodResponse;
+import org.xmlrpc.android.pojo.Value;
+import org.xmlrpc.android.pojo.XMLRPCClientRetrofit;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -420,6 +427,25 @@ public class ApiHelper {
         if (blog == null) {
             return null;
         }
+
+        ArrayList<org.xmlrpc.android.pojo.Param> params = new ArrayList<>();
+        params.add(new org.xmlrpc.android.pojo.Param(new Value(106515912)));
+        params.add(new org.xmlrpc.android.pojo.Param(new Value("stefanosuser2")));
+        params.add(new org.xmlrpc.android.pojo.Param(new Value("")));
+
+        ArrayList<Member> struct = new ArrayList<>();
+        struct.add(new Member("number", new Value(30)));
+        params.add(new org.xmlrpc.android.pojo.Param(new Value(struct)));
+
+        MethodCall xmlCall = new MethodCall("wp.getComments", params);
+
+        XMLRPCClientRetrofit clientRetrofit = ServiceGenerator.createService(XMLRPCClientRetrofit.class, " https://stefanosuser2.wordpress.com/" /*blog.getUri()*/
+                .toString(), AccountHelper.getDefaultAccount().getAccessToken(), true);
+
+        MethodResponse response = clientRetrofit.call(xmlCall).execute().body();
+
+        AppLog.d(T.API, response.params.toString());
+
         XMLRPCClientInterface client = XMLRPCFactory.instantiate(blog.getUri(), blog.getHttpuser(),
                 blog.getHttppassword());
         Object[] result;

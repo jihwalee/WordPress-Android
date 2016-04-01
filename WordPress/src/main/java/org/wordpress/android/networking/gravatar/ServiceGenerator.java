@@ -9,22 +9,25 @@ import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 
 public class ServiceGenerator {
-
-    public static final String API_BASE_URL = "https://api.gravatar.com/v1/";
 
     private static HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor
             .Level.BODY);
 
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder().addInterceptor(logging);
 
-    private static Retrofit.Builder builder =
-            new Retrofit.Builder()
-                    .baseUrl(API_BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create());
+    public static <S> S createService(Class<S> serviceClass, String baseUrl, final String token, boolean withXML) {
+        Retrofit.Builder builder = new Retrofit.Builder()
+                .baseUrl(baseUrl);
 
-    public static <S> S createService(Class<S> serviceClass, final String token) {
+        if (withXML) {
+            builder.addConverterFactory(SimpleXmlConverterFactory.create());
+        } else {
+            builder.addConverterFactory(GsonConverterFactory.create());
+        }
+
         if (token != null) {
             httpClient.addInterceptor(new Interceptor() {
                 @Override

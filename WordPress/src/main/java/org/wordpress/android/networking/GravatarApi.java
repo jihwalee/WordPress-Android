@@ -14,6 +14,8 @@ import retrofit2.Response;
 
 public class GravatarApi {
 
+    public static final String API_BASE_URL = "https://api.gravatar.com/v1/";
+
     public interface GravatarUploadListener {
         void onSuccess();
         void onError();
@@ -29,8 +31,8 @@ public class GravatarApi {
     }
 
     public static void uploadGravatar(final File file, final GravatarUploadListener gravatarUploadListener) {
-        GravatarClient client = ServiceGenerator.createService(GravatarClient.class, AccountHelper.getDefaultAccount
-                ().getAccessToken());
+        GravatarClient client = ServiceGenerator.createService(GravatarClient.class, API_BASE_URL, AccountHelper
+                .getDefaultAccount().getAccessToken(), false);
 
         prepareGravatarUpload(client, AccountHelper.getDefaultAccount().getEmail(), file)
                 .enqueue(new Callback<GravatarUploadResponse>() {
