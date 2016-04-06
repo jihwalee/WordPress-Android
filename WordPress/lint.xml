@@ -4,8 +4,11 @@
     <issue id="ExtraTranslation" severity="ignore" />
     <issue id="RtlCompat" severity="warning" />
 
+    <!-- https://github.com/codepath/android_guides/wiki/Consuming-APIs-with-Retrofit#issues -->
     <issue id="InvalidPackage">
         <ignore regexp="okio-1.6.0.jar" />
+        <ignore regexp=".*retrofit.*" />
+        <ignore regexp="org.simpleframework.xml.*" />
     </issue>
 
     <issue id="NewApi">
