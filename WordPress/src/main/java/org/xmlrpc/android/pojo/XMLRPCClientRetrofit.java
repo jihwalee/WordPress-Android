@@ -5,6 +5,6 @@ import retrofit2.http.Body;
 import retrofit2.http.POST;
 
 public interface XMLRPCClientRetrofit {
-    @POST("/xmlrpc.php")
+    @POST("xmlrpc.php")
     Call<MethodResponse> call(@Body MethodCall methodCall);
 }

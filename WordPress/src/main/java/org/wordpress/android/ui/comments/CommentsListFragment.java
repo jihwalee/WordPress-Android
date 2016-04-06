@@ -32,11 +32,11 @@ import org.wordpress.android.util.ToastUtils;
 import org.xmlrpc.android.ApiHelper;
 import org.xmlrpc.android.ApiHelper.ErrorType;
 import org.xmlrpc.android.XMLRPCFault;
+import org.xmlrpc.android.pojo.Params;
+import org.xmlrpc.android.pojo.Struct;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CommentsListFragment extends Fragment {
 
@@ -544,26 +544,28 @@ public class CommentsListFragment extends Fragment {
                 return null;
             }
 
-            Map<String, Object> hPost = new HashMap<>();
+            Struct hPost = new Struct();
             if (mIsLoadingMore) {
                 int numExisting = getAdapter().getItemCount();
-                hPost.put("offset", numExisting);
-                hPost.put("number", COMMENTS_PER_PAGE);
+                hPost.add("offset", numExisting);
+                hPost.add("number", COMMENTS_PER_PAGE);
             } else {
-                hPost.put("number", COMMENTS_PER_PAGE);
+                hPost.add("number", COMMENTS_PER_PAGE);
             }
 
             if (mStatusFilter != null){
                 //if this is UNKNOWN that means show ALL, i.e., do not apply filter
                 if (!mStatusFilter.equals(CommentStatus.UNKNOWN)){
-                    hPost.put("status", CommentStatus.toString(mStatusFilter));
+                    hPost.add("status", CommentStatus.toString(mStatusFilter));
                 }
             }
 
-            Object[] params = { blog.getRemoteBlogId(),
-                                blog.getUsername(),
-                                blog.getPassword(),
-                                hPost };
+            Params params = new Params()
+                    .add(blog.getRemoteBlogId())
+                    .add(blog.getUsername())
+                    .add(blog.getPassword())
+                    .add(hPost);
+
             try {
                 CommentList comments = ApiHelper.refreshComments(blog, params, new ApiHelper.DatabasePersistCallback() {
                     @Override

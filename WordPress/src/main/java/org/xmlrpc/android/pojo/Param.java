@@ -12,4 +12,16 @@ public class Param {
     public Param(Value value) {
         this.value = value;
     }
+
+    public Param(int i4) {
+        this.value = new Value(i4);
+    }
+
+    public Param(String string) {
+        this.value = new Value(string);
+    }
+
+    public Param(Struct struct) {
+        this.value = new Value(struct);
+    }
 }

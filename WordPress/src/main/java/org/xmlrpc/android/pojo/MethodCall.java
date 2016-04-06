@@ -1,22 +1,19 @@
 package org.xmlrpc.android.pojo;
 
 import org.simpleframework.xml.Element;
-import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
-
-import java.util.ArrayList;
 
 @Root
 public class MethodCall {
     @Element
     public String methodName;
 
-    @ElementList
-    public ArrayList<Param> params;
+    @Element
+    public Params params;
 
     public MethodCall() {}
 
-    public MethodCall(String methodName, ArrayList<Param> params) {
+    public MethodCall(String methodName, Params params) {
         this.methodName = methodName;
         this.params = params;
     }

@@ -34,13 +34,13 @@ import org.wordpress.android.ui.stats.StatsWidgetProvider;
 import org.wordpress.android.util.AnalyticsUtils;
 import org.wordpress.android.util.AppLog;
 import org.wordpress.android.util.AppLog.T;
-import org.wordpress.android.util.DateTimeUtils;
 import org.wordpress.android.util.MapUtils;
 import org.wordpress.android.util.helpers.MediaFile;
 import org.xmlpull.v1.XmlPullParserException;
-import org.xmlrpc.android.pojo.Member;
 import org.xmlrpc.android.pojo.MethodCall;
 import org.xmlrpc.android.pojo.MethodResponse;
+import org.xmlrpc.android.pojo.Params;
+import org.xmlrpc.android.pojo.Struct;
 import org.xmlrpc.android.pojo.Value;
 import org.xmlrpc.android.pojo.XMLRPCClientRetrofit;
 
@@ -338,10 +338,15 @@ public class ApiHelper {
             }
 
             // refresh the comments
-            Map<String, Object> hPost = new HashMap<String, Object>();
-            hPost.put("number", 30);
-            Object[] commentParams = {mBlog.getRemoteBlogId(), mBlog.getUsername(),
-                    mBlog.getPassword(), hPost};
+            Struct hPost = new Struct();
+            hPost.add("number", 30);
+
+            Params commentParams = new Params()
+                    .add(mBlog.getRemoteBlogId())
+                    .add(mBlog.getUsername())
+                    .add(mBlog.getPassword())
+                    .add(hPost);
+
             try {
                 ApiHelper.refreshComments(mBlog, commentParams, new DatabasePersistCallback() {
                     @Override
@@ -422,57 +427,37 @@ public class ApiHelper {
         return numDeleted;
     }
 
-    public static CommentList refreshComments(Blog blog, Object[] commentParams, DatabasePersistCallback dbCallback)
+    public static CommentList refreshComments(Blog blog, org.xmlrpc.android.pojo.Params commentParams, DatabasePersistCallback dbCallback)
             throws XMLRPCException, IOException, XmlPullParserException {
         if (blog == null) {
             return null;
         }
 
-        ArrayList<org.xmlrpc.android.pojo.Param> params = new ArrayList<>();
-        params.add(new org.xmlrpc.android.pojo.Param(new Value(106515912)));
-        params.add(new org.xmlrpc.android.pojo.Param(new Value("stefanosuser2")));
-        params.add(new org.xmlrpc.android.pojo.Param(new Value("")));
+        MethodCall xmlCall = new MethodCall(Method.GET_COMMENTS, commentParams);
 
-        ArrayList<Member> struct = new ArrayList<>();
-        struct.add(new Member("number", new Value(30)));
-        params.add(new org.xmlrpc.android.pojo.Param(new Value(struct)));
-
-        MethodCall xmlCall = new MethodCall("wp.getComments", params);
-
-        XMLRPCClientRetrofit clientRetrofit = ServiceGenerator.createService(XMLRPCClientRetrofit.class, " https://stefanosuser2.wordpress.com/" /*blog.getUri()*/
-                .toString(), AccountHelper.getDefaultAccount().getAccessToken(), true);
+        XMLRPCClientRetrofit clientRetrofit = ServiceGenerator.createService(XMLRPCClientRetrofit.class, blog
+                .getHomeURL(), AccountHelper.getDefaultAccount().getAccessToken(), true);
 
         MethodResponse response = clientRetrofit.call(xmlCall).execute().body();
 
-        AppLog.d(T.API, response.params.toString());
-
-        XMLRPCClientInterface client = XMLRPCFactory.instantiate(blog.getUri(), blog.getHttpuser(),
-                blog.getHttppassword());
-        Object[] result;
-        result = (Object[]) client.call(Method.GET_COMMENTS, commentParams);
-
-        if (result.length == 0) {
+        if (response.params.size() == 0) {
             return null;
         }
 
-        Map<?, ?> contentHash;
         long commentID, postID;
         String authorName, content, status, authorEmail, authorURL, postTitle, pubDate;
-        java.util.Date date;
         CommentList comments = new CommentList();
 
-        for (int ctr = 0; ctr < result.length; ctr++) {
-            contentHash = (Map<?, ?>) result[ctr];
-            content = contentHash.get("content").toString();
-            status = contentHash.get("status").toString();
-            postID = Long.parseLong(contentHash.get("post_id").toString());
-            commentID = Long.parseLong(contentHash.get("comment_id").toString());
-            authorName = contentHash.get("author").toString();
-            authorURL = contentHash.get("author_url").toString();
-            authorEmail = contentHash.get("author_email").toString();
-            postTitle = contentHash.get("post_title").toString();
-            date = (java.util.Date) contentHash.get("date_created_gmt");
-            pubDate = DateTimeUtils.javaDateToIso8601(date);
+        for (Value v : response.params.get(0).value.array.data) {
+            content = v.struct.get("content").string;
+            status = v.struct.get("status").string;
+            postID = Long.parseLong(v.struct.get("post_id").string);
+            commentID = Long.parseLong(v.struct.get("comment_id").string);
+            authorName = v.struct.get("author").string;
+            authorURL = v.struct.get("author_url").string;
+            authorEmail = v.struct.get("author_email").string;
+            postTitle = v.struct.get("post_title").string;
+            pubDate = v.struct.get("date_created_gmt").dateTimeString;
 
             Comment comment = new Comment(
                     postID,
