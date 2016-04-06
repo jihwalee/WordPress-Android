@@ -24,4 +24,8 @@ public class Params {
         mParams.add(new Param(struct));
         return this;
     }
+
+    public Param get(int index) {
+        return mParams.get(index);
+    }
 }

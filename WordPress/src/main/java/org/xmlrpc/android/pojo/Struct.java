@@ -35,7 +35,20 @@ public class Struct implements Iterable<Member> {
         mValuesMap.put(name, value);
     }
 
+    // needed when the Struct has been deserialized and the mValuesMap is not filled yet
+    private void refreshValuesMap() {
+        mValuesMap.clear();
+
+        for (Member member : mMembers) {
+            mValuesMap.put(member.name, member.value);
+        }
+    }
+
     public Value get(String name) {
+        if (mValuesMap.size() != mMembers.size()) {
+            refreshValuesMap();
+        }
+
         return mValuesMap.get(name);
     }
 

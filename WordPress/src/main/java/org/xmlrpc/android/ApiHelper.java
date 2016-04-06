@@ -440,10 +440,6 @@ public class ApiHelper {
 
         MethodResponse response = clientRetrofit.call(xmlCall).execute().body();
 
-        if (response.params.size() == 0) {
-            return null;
-        }
-
         long commentID, postID;
         String authorName, content, status, authorEmail, authorURL, postTitle, pubDate;
         CommentList comments = new CommentList();
